@@ -20,6 +20,10 @@ int module_start(SceSize args, void *argp) {
 	
 	tai_module_info_t tai_info;
 	tai_info.size = sizeof(tai_module_info_t);
+
+	if (taiGetModuleInfo("AdrenalineUser", &tai_info) >= 0){
+	    return 0;
+	}
 	
 	SceUID ret = taiGetModuleInfo("ScePspemu", &tai_info);
 	if (ret >= 0){
@@ -64,3 +68,4 @@ int module_stop(SceSize args, void *argp) {
 	
 	return SCE_KERNEL_STOP_SUCCESS;
 }
+
