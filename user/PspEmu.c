@@ -252,12 +252,8 @@ void handle_rif(const char** file){
 // without this you cannot start POPS games (PS1 emulator)
 // if the license file is COMPLETELY missing from /PSP/LICENSE ..
 static SceUID sceIoGetstatPatched(const char* file, SceIoStat* stat) {
-	char new_path[256] = {0};
-	if (file != NULL){
-		strncpy(new_path, file, sizeof(new_path));
-		ps1cfw_getstat_filter(new_path);
-		file = new_path;
-	}
+
+	file = sceIoGetstatPS1(file);
 
 	SceUID ret = TAI_CONTINUE(SceUID, sceIoGetstatRef, file, stat);	
 	if( file != NULL && (ret < 0 && IS_RIF_PATH(file)) ) {
@@ -274,17 +270,9 @@ static SceUID sceIoGetstatPatched(const char* file, SceIoStat* stat) {
 }
 
 static SceUID sceIoOpenPatched(const char *file, int flags, SceMode mode) {
-	char new_path[256] = {0};
-	if (file != NULL){
-		strncpy(new_path, file, sizeof(new_path));
-		int custom_ret = 0;
-		if (ps1cfw_open_filter(new_path, &custom_ret)){
-			return custom_ret;
-		}
-		file = new_path;
-	}
-
 	char extension[0x10];
+
+	if (sceIoOpenPS1(&file) == 0) return 0;
 
 	if(file != NULL) {
 		get_extension(file, extension, sizeof(extension));
