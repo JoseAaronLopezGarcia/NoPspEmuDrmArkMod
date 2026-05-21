@@ -55,12 +55,8 @@ static void get_functions(tai_module_info_t tai_info, uint32_t text_addr) {
 }
 
 // IO Open patched
-int sceIoOpenPS1(char** pfile) {
+int sceIoOpenPS1(char* file) {
   
-    if (!pfile || !*pfile) return -1;
-
-	char* file = *pfile;
-
     // Virtual Kernel Exploit (allow easy escalation of priviledge on ePSP)
     if (strstr(file, "__dokxploit__") != 0){
         uint32_t *m;
@@ -131,8 +127,7 @@ int sceIoOpenPS1(char** pfile) {
     if (popsconfig.magic == ARK_MAGIC && popsconfig.title_id[0] && popsconfig.path[0]){
       char *p = strrchr(file, '/');
       if (p) {
-        static char new_file[256];
-
+        char new_file[256];
         if (strcmp(p+1, "__sce_menuinfo") == 0) {
           char *filename = popsconfig.path;
           char *q = strrchr(filename, '/');
@@ -142,35 +137,36 @@ int sceIoOpenPS1(char** pfile) {
             path[q-filename] = '\0';
 
             snprintf(new_file, sizeof(new_file), "ms0:%s/__sce_menuinfo", path);
-            file = new_file;
+            strcpy(file, new_file);
           }
         } else if (strstr(file, "/SCPS10084/") &&
                   (strcmp(p+1, "PARAM.SFO") == 0 ||
                    strcmp(p+1, "SCEVMC0.VMP") == 0 ||
                    strcmp(p+1, "SCEVMC1.VMP") == 0)) {
           snprintf(new_file, sizeof(new_file), "ms0:PSP/SAVEDATA/%s/%s", popsconfig.title_id, p+1);
-          *pfile = new_file;
+          strcpy(file, new_file);
         }
       }
     }
     return -1;
 }
 
-char* sceIoGetstatPS1(const char *file) {
+int sceIoGetstatPS1(char *file) {
   if (popsconfig.magic == ARK_MAGIC && popsconfig.title_id[0] && popsconfig.path[0]){
       char *p = strrchr(file, '/');
       if (p) {
-        static char new_file[256];
+        char new_file[256];
         if (strstr(file, "/SCPS10084/") &&
            (strcmp(p+1, "PARAM.SFO") == 0 ||
             strcmp(p+1, "SCEVMC0.VMP") == 0 ||
             strcmp(p+1, "SCEVMC1.VMP") == 0)) {
           snprintf(new_file, sizeof(new_file), "ms0:PSP/SAVEDATA/%s/%s", popsconfig.title_id, p+1);
-          file = new_file;
+          strcpy(file, new_file);
+          return 0;
         }
       }
   }
-  return file;
+  return -1;
 }
 
 int ps1cfw_enabler_start(tai_module_info_t tai_info) {

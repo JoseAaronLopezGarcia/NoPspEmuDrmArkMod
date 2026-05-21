@@ -253,7 +253,9 @@ void handle_rif(const char** file){
 // if the license file is COMPLETELY missing from /PSP/LICENSE ..
 static SceUID sceIoGetstatPatched(const char* file, SceIoStat* stat) {
 
-	file = sceIoGetstatPS1(file);
+	char newpath[256]; strcpy(newpath, file); file = newpath;
+
+	sceIoGetstatPS1(file);
 
 	SceUID ret = TAI_CONTINUE(SceUID, sceIoGetstatRef, file, stat);	
 	if( file != NULL && (ret < 0 && IS_RIF_PATH(file)) ) {
@@ -270,9 +272,13 @@ static SceUID sceIoGetstatPatched(const char* file, SceIoStat* stat) {
 }
 
 static SceUID sceIoOpenPatched(const char *file, int flags, SceMode mode) {
-	char extension[0x10];
 
-	if (sceIoOpenPS1(&file) == 0) return 0;
+	if (!file) return -1;
+
+	char extension[0x10];
+	char newpath[256]; strcpy(newpath, file); file = newpath;
+
+	if (sceIoOpenPS1(file) == 0) return 0;
 
 	if(file != NULL) {
 		get_extension(file, extension, sizeof(extension));

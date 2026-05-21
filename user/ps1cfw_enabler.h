@@ -4,8 +4,8 @@
 int ps1cfw_enabler_start(tai_module_info_t tai_info);
 int ps1cfw_enabler_stop();
 
-int sceIoOpenPS1(char** pfile);
-char* sceIoGetstatPS1(const char *file);
+int sceIoOpenPS1(char* file);
+int sceIoGetstatPS1(char *file);
 
 #endif
 
