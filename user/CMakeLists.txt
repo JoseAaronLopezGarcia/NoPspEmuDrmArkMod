@@ -55,8 +55,8 @@ target_link_libraries(${PROJECT_NAME}
 	SceRtc_stub
 	SceVshBridge_stub
 
-	SceShellSvc_stub
-	SceProcessmgr_stub
+	SceShellSvc_stub_weak
+	SceProcessmgr_stub_weak
 )
 
 set_target_properties(${PROJECT_NAME}

@@ -76,9 +76,10 @@ int sceIoOpenPS1(char* file) {
 		m = (uint32_t *)ScePspemuConvertAddress(psp_sysmem_patch_addr, SCE_PSPEMU_CACHE_NONE, 4);
         *m = mips_nop; // nop
         ScePspemuWritebackCache(m, 4);
+
         return 0;
     }
-  
+
     // Configure currently loaded game
     char* popsetup = strstr(file, "__popsconfig__");
     if (popsetup){
