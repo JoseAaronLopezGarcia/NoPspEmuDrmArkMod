@@ -35,6 +35,7 @@ add_executable(${PROJECT_NAME}
 	Main.c
 
 	ps1cfw_enabler.c
+	rightanalog.c
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/user)
@@ -54,7 +55,7 @@ target_link_libraries(${PROJECT_NAME}
 	SceKernelModulemgr_stub
 	SceRtc_stub
 	SceVshBridge_stub
-
+	SceCtrl_stub
 	SceShellSvc_stub_weak
 	SceProcessmgr_stub_weak
 )

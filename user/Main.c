@@ -37,6 +37,10 @@ int module_start(SceSize args, void *argp) {
 		if (ret != SCE_KERNEL_START_SUCCESS){
 			LOG("%s: failed starting ps1cfw_enabler, 0x%x\n", __func__, ret);
 		}
+		ret = rightanalog_start();
+		if (ret != SCE_KERNEL_START_SUCCESS){
+			LOG("%s: failed starting rightanalog, 0x%x\n", __func__, ret);
+		}
 		LOG("%s: pspemu patched\n", __func__);
 		return ret;
 	}
@@ -61,6 +65,7 @@ int module_stop(SceSize args, void *argp) {
 		if (ret != SCE_KERNEL_STOP_SUCCESS){
 			LOG("%s: failed stopping pspemu patches, 0x%x\n", __func__, ret);
 		}
+		ret = rightanalog_stop();
 		LOG("%s: pspemu unpatched\n", __func__);
 		return ret;
 	}
