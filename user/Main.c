@@ -22,55 +22,38 @@ int module_start(SceSize args, void *argp) {
 	tai_info.size = sizeof(tai_module_info_t);
 
 	if (taiGetModuleInfo("AdrenalineUser", &tai_info) >= 0){
-	    return 0;
+	    return SCE_KERNEL_START_SUCCESS;
 	}
 	
 	SceUID ret = taiGetModuleInfo("ScePspemu", &tai_info);
 	if (ret >= 0){
 		patched_pspemu = 1;
-		int ret = pspemu_module_start(tai_info);
-		if (ret != SCE_KERNEL_START_SUCCESS){
-			LOG("%s: failed patching pspemu, 0x%x", __func__, ret);
-			return ret;
-		}
-		ret = ps1cfw_enabler_start(tai_info);
-		if (ret != SCE_KERNEL_START_SUCCESS){
-			LOG("%s: failed starting ps1cfw_enabler, 0x%x\n", __func__, ret);
-		}
-		ret = rightanalog_start();
-		if (ret != SCE_KERNEL_START_SUCCESS){
-			LOG("%s: failed starting rightanalog, 0x%x\n", __func__, ret);
-		}
-		LOG("%s: pspemu patched\n", __func__);
-		return ret;
+		pspemu_module_start(tai_info);
+		ps1cfw_enabler_start(tai_info);
+		rightanalog_start();
+		return SCE_KERNEL_START_SUCCESS;
 	}
 	
 	ret = taiGetModuleInfo("SceShell", &tai_info);
 	if (ret >= 0){
 		patched_sceshell = 1;
-		return sceshell_module_start(tai_info);
+		sceshell_module_start(tai_info);
+		return SCE_KERNEL_START_SUCCESS;
 	}
 
 	return SCE_KERNEL_START_NO_RESIDENT;
 }
 
 int module_stop(SceSize args, void *argp) {
-	if(patched_pspemu) {
-		int ret = ps1cfw_enabler_stop();
-		if (ret != SCE_KERNEL_STOP_SUCCESS){
-			LOG("%s: failed stopping ps1cfw_enabler, 0x%x\n", __func__, ret);
-			return ret;
-		}
-		ret = pspemu_module_stop();
-		if (ret != SCE_KERNEL_STOP_SUCCESS){
-			LOG("%s: failed stopping pspemu patches, 0x%x\n", __func__, ret);
-		}
-		ret = rightanalog_stop();
-		LOG("%s: pspemu unpatched\n", __func__);
-		return ret;
+	if (patched_pspemu) {
+		ps1cfw_enabler_stop();
+		pspemu_module_stop();
+		rightanalog_stop();
+		return SCE_KERNEL_STOP_SUCCESS;
 	}
-	if(patched_sceshell) return sceshell_module_stop();
-	
+	if (patched_sceshell){
+		sceshell_module_stop();
+		return SCE_KERNEL_STOP_SUCCESS;
+	}
 	return SCE_KERNEL_STOP_SUCCESS;
 }
-
