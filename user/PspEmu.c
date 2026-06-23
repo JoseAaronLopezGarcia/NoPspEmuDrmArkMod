@@ -274,6 +274,8 @@ static SceUID sceIoGetstatPatched(const char* file, SceIoStat* stat) {
 static SceUID sceIoOpenPatched(const char *file, int flags, SceMode mode) {
 
 	if (!file) return -1;
+	
+	if (strstr(file, "__highmem__") != 0) return 0;
 
 	char extension[0x10];
 	char newpath[256]; strcpy(newpath, file); file = newpath;
